@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="SkyCast — real-time weather and 7-day forecast for any city. Built by Arman Hossain.">
+  <title>SkyCast | Weather App</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⛅</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body data-theme="clear-day">
+
+  <!-- Animated background (colors change with the weather) -->
+  <div class="bg" aria-hidden="true"><span></span><span></span><span></span></div>
+
+  <div class="app">
+    <!-- ===== Header ===== -->
+    <header class="header">
+      <a href="./" class="logo">⛅ Sky<span>Cast</span></a>
+
+      <div class="unit-toggle" role="group" aria-label="Temperature unit">
+        <button type="button" class="unit-btn active" data-unit="c" aria-pressed="true">°C</button>
+        <button type="button" class="unit-btn" data-unit="f" aria-pressed="false">°F</button>
+      </div>
+    </header>
+
+    <!-- ===== Search ===== -->
+    <form class="search" id="searchForm" autocomplete="off" role="search">
+      <div class="search-box">
+        <svg class="search-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 2a8 8 0 0 1 6.3 12.9l5.4 5.4-1.4 1.4-5.4-5.4A8 8 0 1 1 10 2Zm0 2a6 6 0 1 0 0 12 6 6 0 0 0 0-12Z"/></svg>
+        <input
+          type="text"
+          id="searchInput"
+          placeholder="Search city… (e.g. Dhaka, Tokyo, London)"
+          aria-label="Search city"
+          role="combobox"
+          aria-expanded="false"
+          aria-controls="suggestions"
+          aria-autocomplete="list"
+        >
+        <ul class="suggestions" id="suggestions" role="listbox" hidden></ul>
+      </div>
+      <button type="button" class="icon-btn" id="locateBtn" aria-label="Use my location" title="Use my location">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8a4 4 0 1 1 0 8 4 4 0 0 1 0-8Zm-1-7h2v3.06A8 8 0 0 1 19.94 11H23v2h-3.06A8 8 0 0 1 13 19.94V23h-2v-3.06A8 8 0 0 1 4.06 13H1v-2h3.06A8 8 0 0 1 11 4.06V1Zm1 5a6 6 0 1 0 0 12 6 6 0 0 0 0-12Z"/></svg>
+      </button>
+    </form>
+
+    <!-- ===== Status (loading / error) ===== -->
+    <p class="status" id="status" role="status" aria-live="polite"></p>
+
+    <!-- ===== Weather ===== -->
+    <main class="weather" id="weather" aria-busy="true">
+      <!-- Current conditions -->
+      <section class="card current">
+        <div class="current-top">
+          <div>
+            <h1 class="place" id="place">—</h1>
+            <p class="local-time" id="localTime">&nbsp;</p>
+          </div>
+          <span class="badge" id="dayBadge">&nbsp;</span>
+        </div>
+
+        <div class="current-main">
+          <img class="current-icon" id="currentIcon" src="" alt="" width="180" height="180">
+          <div>
+            <p class="temp"><span id="temp">--</span><sup class="unit-label">°C</sup></p>
+            <p class="condition" id="condition">&nbsp;</p>
+            <p class="range">
+              <span>H: <b id="tempMax">--</b>°</span>
+              <span>L: <b id="tempMin">--</b>°</span>
+              <span>Feels like <b id="feelsLike">--</b>°</span>
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Highlights -->
+      <section class="highlights" aria-label="Today's highlights">
+        <div class="card hl">
+          <img src="https://cdn.jsdelivr.net/gh/basmilius/weather-icons@2.0.0/production/fill/all/humidity.svg" alt="" width="48" height="48">
+          <p class="hl-label">Humidity</p>
+          <p class="hl-value"><span id="humidity">--</span>%</p>
+          <div class="meter"><span id="humidityBar"></span></div>
+        </div>
+        <div class="card hl">
+          <img src="https://cdn.jsdelivr.net/gh/basmilius/weather-icons@2.0.0/production/fill/all/wind.svg" alt="" width="48" height="48">
+          <p class="hl-label">Wind</p>
+          <p class="hl-value"><span id="wind">--</span> <small id="windUnit">km/h</small></p>
+          <p class="hl-sub"><span class="arrow" id="windArrow">↑</span> <span id="windDir">--</span></p>
+        </div>
+        <div class="card hl">
+          <img src="https://cdn.jsdelivr.net/gh/basmilius/weather-icons@2.0.0/production/fill/all/uv-index.svg" alt="" width="48" height="48">
+          <p class="hl-label">UV Index</p>
+          <p class="hl-value" id="uv">--</p>
+          <p class="hl-sub" id="uvLevel">&nbsp;</p>
+        </div>
+        <div class="card hl">
+          <img src="https://cdn.jsdelivr.net/gh/basmilius/weather-icons@2.0.0/production/fill/all/raindrops.svg" alt="" width="48" height="48">
+          <p class="hl-label">Rain chance</p>
+          <p class="hl-value"><span id="rainChance">--</span>%</p>
+          <div class="meter"><span id="rainBar"></span></div>
+        </div>
+        <div class="card hl">
+          <img src="https://cdn.jsdelivr.net/gh/basmilius/weather-icons@2.0.0/production/fill/all/barometer.svg" alt="" width="48" height="48">
+          <p class="hl-label">Pressure</p>
+          <p class="hl-value"><span id="pressure">--</span> <small>hPa</small></p>
+        </div>
+        <div class="card hl sun">
+          <div>
+            <img src="https://cdn.jsdelivr.net/gh/basmilius/weather-icons@2.0.0/production/fill/all/sunrise.svg" alt="" width="48" height="48">
+            <p class="hl-label">Sunrise</p>
+            <p class="hl-value small" id="sunrise">--</p>
+          </div>
+          <div>
+            <img src="https://cdn.jsdelivr.net/gh/basmilius/weather-icons@2.0.0/production/fill/all/sunset.svg" alt="" width="48" height="48">
+            <p class="hl-label">Sunset</p>
+            <p class="hl-value small" id="sunset">--</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Hourly -->
+      <section class="card">
+        <h2 class="card-title">Next 24 hours</h2>
+        <ul class="hourly" id="hourly"></ul>
+      </section>
+
+      <!-- Daily -->
+      <section class="card">
+        <h2 class="card-title">7-day forecast</h2>
+        <ul class="daily" id="daily"></ul>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <p>
+        Built by <a href="https://armanhossain81155.github.io/my-portfolio/" target="_blank" rel="noopener">Arman Hossain</a>
+        · Data: <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a>
+        · Icons: <a href="https://bas.dev/work/meteocons" target="_blank" rel="noopener">Meteocons</a>
+      </p>
+    </footer>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
